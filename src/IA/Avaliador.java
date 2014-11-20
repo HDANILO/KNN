@@ -27,7 +27,7 @@ public class Avaliador<T extends DatasetType> {
 		{
 			int predict_index = -1;
 			int desired_index = -1;
-			String classe = algoritmo.classify(datasetValidacao[i], 2);
+			String classe = algoritmo.classify(datasetValidacao[i]);
 			for(int j = 0; j < l.size(); j++)
 			{
 				if (classe.compareTo(l.get(j)) == 0)

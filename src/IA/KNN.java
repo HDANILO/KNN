@@ -24,16 +24,17 @@ class DistancePoint implements Comparable<DistancePoint>
 
 public class KNN<T extends DatasetType> extends Classifier<T> {
 	
-	int k;
+	int k, q;
 	T[] dataset;
 	
-	public KNN(int k, T[] dataset)
+	public KNN(int k,int q, T[] dataset)
 	{
 		this.k = k;
+		this.q = q;
 		this.dataset = dataset;
 	}
 	
-	public String classify(T elem, int q)
+	public String classify(T elem)
 	{
 		//pega todas possíveis classes
 		LinkedList<String> l = new LinkedList<String>();
@@ -86,16 +87,50 @@ public class KNN<T extends DatasetType> extends Classifier<T> {
 		return l.get(maior);
 	}
 	
+	public double regression(T elem)
+	{
+		//computa a distancia de minkowski para cada elemento
+		DistancePoint[] distances = new DistancePoint[dataset.length];
+		for(int i = 0; i < dataset.length; i++)
+		{
+			distances[i] = new DistancePoint();
+			distances[i].indexInDataset = i;
+			distances[i].distance = minkowski_distance(dataset[i],elem,q);
+		}
+		
+		//ordena baseado no critério definido em DistancePoint
+		Arrays.sort(distances);
+		
+		//Epanechnikov quadratic
+		double reg = 0;
+		double pond = 0;
+		for(int i = 0; i < k; i++)
+		{
+			reg += (1/distances[i].distance)*dataset[distances[i].indexInDataset].getDesiredValue();
+			pond += (1/distances[i].distance);
+		}
+		
+		if (pond < 0.000000001d && pond > -0.000000001d)
+			pond = 0.1;
+		
+		reg = reg/pond;
+		if(Double.isNaN(reg))
+		{
+			System.out.println("Deu NaN");
+		}
+		//retorna a media ponderada
+		return reg;
+	}
+	
 	public double minkowski_distance(T elem1, T elem2, int q)
 	{
 		double dist = 0;
 		for(int i = 0; i < elem1.getNumAttr(); i++)
 		{
-			dist += Math.pow(elem1.getAttr(i) - elem2.getAttr(i),q); 
+			dist += Math.pow(Math.abs(elem1.getAttr(i) - elem2.getAttr(i)),q); 
 		}
 		dist = Math.pow(dist, 1f/q);
 		
 		return dist;
 	}
-
 }

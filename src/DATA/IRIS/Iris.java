@@ -42,7 +42,10 @@ public class Iris extends DatasetType {
 		return 5;
 	}
 
-	public double getAttrRange(int index) {
-		return 10;
+	@Override
+	public double getDesiredValue() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
+
 }
